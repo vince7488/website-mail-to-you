@@ -1,0 +1,7 @@
+/config/config.php
+/storage/logs/*
+/storage/rate-limits/*
+!/storage/logs/.gitkeep
+!/storage/rate-limits/.gitkeep
+/vendor/
+.phpunit.cache/
