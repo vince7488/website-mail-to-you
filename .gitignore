@@ -1,5 +1,6 @@
 # Application config and secrets
 /config/config.php
+/config/config.local.php
 
 # Application runtime data
 /storage/logs/*
