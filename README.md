@@ -34,6 +34,12 @@ Please read the [Frontend integration documentation](https://github.com/vince748
    Copy the example configuration file and edit it to add your local SMTP details:
 
    ```bash
+   cp config/config.example.php config/config.local.php
+   ```
+
+   for your production site, create a separate configuration file.
+
+   ```bash
    cp config/config.example.php config/config.php
    ```
 

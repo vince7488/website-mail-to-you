@@ -24,6 +24,14 @@ class ConfigLoader
             throw new RuntimeException("Configuration file must return an array.");
         }
 
+        $localPath = preg_replace('/\.php$/', '.local.php', $path);
+        if ($localPath !== null && file_exists($localPath)) {
+            $localConfig = require $localPath;
+            if (is_array($localConfig)) {
+                $config = array_replace_recursive($config, $localConfig);
+            }
+        }
+
         return $config;
     }
 }
