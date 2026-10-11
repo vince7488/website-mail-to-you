@@ -1,0 +1,41 @@
+# Application config and secrets
+/config/config.php
+/config/config.local.php
+
+# Application runtime data
+/storage/logs/*
+/storage/rate-limits/*
+!/storage/logs/.gitkeep
+!/storage/rate-limits/.gitkeep
+
+# Composer dependencies
+/vendor/
+
+# Testing caches
+.phpunit.cache/
+.phpunit.result.cache
+
+# General environments and logs
+.env
+.env.*
+*.log
+roadmap.md
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE and Editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.buildpath
+.project
+.settings/
