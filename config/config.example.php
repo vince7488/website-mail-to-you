@@ -94,7 +94,7 @@ return [
             'error_redirect_url' =>
                 'https://example.com/contact/error/',
 
-            'honeypot_field' => 'company_website',
+            'honeypot_field' => 'confirm_email',
 
             'timing' => [
                 'field' => '_started_at',
