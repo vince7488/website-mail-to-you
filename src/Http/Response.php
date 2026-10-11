@@ -15,7 +15,7 @@ class Response
 
     public static function json(array $data, int $status = 200, array $headers = []): self
     {
-        $headers['Content-Type'] = 'application/json';
+        $headers['Content-Type'] = 'application/json; charset=utf-8';
         return new self($status, $headers, json_encode($data, JSON_UNESCAPED_SLASHES));
     }
 

@@ -60,6 +60,11 @@ class ConfigValidator
         if (!filter_var($fromAddress, FILTER_VALIDATE_EMAIL)) {
             throw new RuntimeException('The From address is invalid.');
         }
+
+        $returnPath = $mail['return_path'] ?? '';
+        if (!is_string($returnPath) || !filter_var($returnPath, FILTER_VALIDATE_EMAIL)) {
+            throw new RuntimeException('The return-path address is invalid.');
+        }
     }
 
     private function validateForms(array $forms, bool $isProduction): void
@@ -70,9 +75,13 @@ class ConfigValidator
                 throw new RuntimeException("Form '{$formId}' must have at least one recipient.");
             }
 
-            foreach ($recipients as $recipient) {
-                if (!filter_var($recipient['address'] ?? '', FILTER_VALIDATE_EMAIL)) {
-                    throw new RuntimeException("Form '{$formId}' has an invalid recipient address.");
+            foreach (['recipients', 'cc', 'bcc'] as $addressList) {
+                foreach ($formConfig[$addressList] ?? [] as $recipient) {
+                    if (!is_array($recipient) || !filter_var($recipient['address'] ?? '', FILTER_VALIDATE_EMAIL)) {
+                        throw new RuntimeException(
+                            "Form '{$formId}' has an invalid address in '{$addressList}'."
+                        );
+                    }
                 }
             }
 
@@ -101,9 +110,41 @@ class ConfigValidator
 
             $fields = $formConfig['fields'] ?? [];
             foreach ($fields as $fieldName => $fieldConfig) {
-                if (!preg_match('/^[a-zA-Z0-9_]+$/', $fieldName)) {
+                if (!is_string($fieldName) || !$this->isSafeFieldName($fieldName)) {
                     throw new RuntimeException("Field name '{$fieldName}' is unsafe (use alphanumeric and underscores).");
                 }
+
+                if (!is_array($fieldConfig) || !in_array($fieldConfig['type'] ?? '', ['string', 'email'], true)) {
+                    throw new RuntimeException("Field '{$fieldName}' has an unsupported type.");
+                }
+            }
+
+            $replyToField = $formConfig['reply_to_field'] ?? '';
+            if (
+                !is_string($replyToField)
+                || !isset($fields[$replyToField])
+                || ($fields[$replyToField]['type'] ?? null) !== 'email'
+            ) {
+                throw new RuntimeException("Form '{$formId}' must use a configured email field for Reply-To.");
+            }
+
+            $honeypotField = $formConfig['honeypot_field'] ?? '';
+            if (
+                !is_string($honeypotField)
+                || !$this->isSafeFieldName($honeypotField)
+                || isset($fields[$honeypotField])
+            ) {
+                throw new RuntimeException("Form '{$formId}' has an invalid honeypot field.");
+            }
+
+            $timingField = $formConfig['timing']['field'] ?? '';
+            if (
+                !is_string($timingField)
+                || !$this->isSafeFieldName($timingField)
+                || isset($fields[$timingField])
+                || $timingField === $honeypotField
+            ) {
+                throw new RuntimeException("Form '{$formId}' has an invalid timing field.");
             }
         }
     }
@@ -112,9 +153,23 @@ class ConfigValidator
     {
         if ($rateLimit['enabled'] ?? false) {
             $key = $rateLimit['ip_hash_key'] ?? '';
-            if (strlen($key) < 32) {
+            if (!is_string($key) || strlen($key) < 32) {
                 throw new RuntimeException('Rate-limit IP hash key is missing or too short (minimum 32 bytes).');
             }
+
+            $maximumAttempts = $rateLimit['maximum_attempts'] ?? 0;
+            $windowSeconds = $rateLimit['window_seconds'] ?? 0;
+            if (!is_int($maximumAttempts) || $maximumAttempts < 1) {
+                throw new RuntimeException('Rate-limit maximum attempts must be a positive integer.');
+            }
+            if (!is_int($windowSeconds) || $windowSeconds < 1) {
+                throw new RuntimeException('Rate-limit window must be a positive number of seconds.');
+            }
         }
+    }
+
+    private function isSafeFieldName(string $fieldName): bool
+    {
+        return preg_match('/^[a-zA-Z0-9_]+$/', $fieldName) === 1;
     }
 }

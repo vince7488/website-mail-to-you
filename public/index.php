@@ -23,7 +23,7 @@ try {
     $maxBytes = $config['application']['request_max_bytes'] ?? 32768;
     $request = Request::fromGlobals($maxBytes);
 
-    $router = new Router($config);
+    $router = Router::fromConfig($config);
     $response = $router->dispatch($request);
 
     $response->send();
