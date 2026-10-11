@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 return [
     'application' => [
+        // >>> ENTER YOUR APP ENVIRONMENT AND BASE URL HERE <<<
         'environment' => 'production',
         'debug' => false,
         'public_url' => 'https://forms.example.com',
@@ -12,13 +13,16 @@ return [
     ],
 
     'smtp' => [
+        // >>> ENTER YOUR CPANEL SMTP SERVER DETAILS HERE <<<
         'host' => 'mail.example.com',
+        // Common ports: 465 (with 'smtps') or 587 (with 'starttls')
         'port' => 465,
 
         // Valid values: "smtps", "starttls", or "none".
         'encryption' => 'smtps',
 
         'authenticate' => true,
+        // >>> ENTER YOUR CPANEL EMAIL USERNAME AND PASSWORD HERE <<<
         'username' => 'website@example.com',
         'password' => 'replace-with-real-password',
 
@@ -47,6 +51,7 @@ return [
     ],
 
     'mail' => [
+        // >>> ENTER THE OUTGOING SENDER NAME AND EMAIL ADDRESS HERE <<<
         'from' => [
             'address' => 'website@example.com',
             'name' => 'Example Website',
@@ -58,6 +63,7 @@ return [
 
     'forms' => [
         'contact' => [
+            // >>> ENTER WHO SHOULD RECEIVE NOTIFICATIONS FROM THIS FORM HERE <<<
             'recipients' => [
                 [
                     'address' => 'team@example.com',
@@ -68,12 +74,14 @@ return [
             'cc' => [],
             'bcc' => [],
 
-            // Never accept the email subject directly from the request.
+            // >>> ENTER YOUR DESIRED EMAIL SUBJECT LINE HERE <<<
             'email_subject' => 'New website inquiry',
 
             // The validated visitor address becomes Reply-To.
             'reply_to_field' => 'email',
 
+            // >>> ENTER ALL DOMAINS / ORIGINS ALLOWED TO SUBMIT THIS FORM HERE <<<
+            // e.g. 'https://yourdomain.com', 'http://localhost:3000'
             'allowed_origins' => [
                 'https://example.com',
                 'https://www.example.com',
@@ -134,7 +142,7 @@ return [
         'maximum_attempts' => 5,
         'window_seconds' => 900,
 
-        // Generate a long random value unique to this installation.
+        // >>> ENTER A UNIQUE RANDOM STRING (AT LEAST 32 CHARACTERS) HERE FOR IP HASHING <<<
         'ip_hash_key' => 'replace-with-at-least-32-random-bytes',
 
         // Do not trust X-Forwarded-For unless the actual proxy is listed.

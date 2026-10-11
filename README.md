@@ -30,27 +30,80 @@ Please read the [Frontend integration documentation](https://github.com/vince748
    composer install
    ```
 
-3. **Configure the application**:
-   Copy the example configuration file and edit it to add your local SMTP details:
+3. **(Recommended) Start Mailpit for local email testing**:
+   For local development, we recommend using [Mailpit](https://github.com/axllent/mailpit) as a mock SMTP server. It traps outgoing emails so you can view them in a local web interface without sending real emails.
+
+   - **Installation**:
+     - macOS (Homebrew): `brew install mailpit`
+     - Linux / Windows: Download pre-built binaries from GitHub releases or run via Docker:
+
+       ```bash
+       docker run -d -p 1025:1025 -p 8025:8025 axllent/mailpit
+       ```
+
+   - **Launch in terminal**:
+
+     ```bash
+     mailpit
+     ```
+
+     Once started:
+     - **SMTP server**: listening at `127.0.0.1:1025`
+     - **Web UI**: open `http://localhost:8025` in your browser to view incoming emails.
+
+4. **Configure the application**:
+   Copy the example configuration file to `config/config.local.php`:
 
    ```bash
    cp config/config.example.php config/config.local.php
    ```
 
-   for your production site, create a separate configuration file.
+   Configure `config/config.local.php` to route mail to Mailpit:
+
+   ```php
+   'application' => [
+       'environment' => 'local',
+       'debug' => true,
+       'public_url' => 'http://localhost:8000',
+   ],
+
+   'smtp' => [
+       'host' => '127.0.0.1',
+       'port' => 1025,
+       'encryption' => 'none',
+       'authenticate' => false,
+       'username' => '',
+       'password' => '',
+   ],
+
+   'forms' => [
+       'contact' => [
+           'allowed_origins' => [
+               'http://localhost:3000',
+               'http://localhost:5173',
+               'http://localhost:8000',
+           ],
+           // ...
+       ],
+   ],
+   ```
+
+   *(Note: `config.local.php` is ignored by Git, ensuring local overrides never affect production).*
+
+   For production deployments, you will configure `config/config.php` with your live SMTP credentials:
 
    ```bash
    cp config/config.example.php config/config.php
    ```
 
-4. **Run a local development server**:
+5. **Run a local development server**:
    Start PHP's built-in web server, pointing it to the `public/` directory:
 
    ```bash
    php -S localhost:8000 -t public
    ```
 
-   The backend will now be available at `http://localhost:8000`.
+   The backend will now be available at `http://localhost:8000`. You can check server health at `http://localhost:8000/health`.
 
 ## Setting up in Production
 
